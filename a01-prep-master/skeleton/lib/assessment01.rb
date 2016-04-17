@@ -1,3 +1,4 @@
+#testing. this was made on sunday
 class Array
   def my_inject(accumulator = nil, &prc)
     skip = false
