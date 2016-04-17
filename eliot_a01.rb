@@ -1,3 +1,5 @@
+require 'byebug'
+
 # This is an alternate version of the a01 practice assessment for practice
 # purposes. Hopefully representing the kinds of problems we are likely to
 # encounter in the real thing.
@@ -74,8 +76,25 @@ class Array
   end
 
   def subsets
+    # debugger
+    return [[]] if self.empty?
+    subs = self[0...-1].subsets
+    subs += subs.map {|x| x + [self.last]}
+    subs
   end
 end
+
+#things you CAN'T DO ABOVE:
+# -    subs += subs.map {|x| x << self.last}
+# because << mutates the original array. So all the sub-arrays in subs are being
+# changed, even though you just want to use their values.
+# -   subs += subs.dup.map {|x| x + self.last}
+# Still won't work, because dup is NOT DEEP DUP, so all those subarrays
+# are not duped, and will still be mutated by the <<
+# So the only thing I got to work was this above, just use +, and bracket the
+# added element so you can ensure that it goes into the array properly.
+
+
 
 # patch the String class with substring_count which will take a target and
 # return an array containing the number of times that substring uniquely
@@ -84,5 +103,30 @@ end
 # example: 'hello there'.substring_count('he') => [2, [0, 7]]
 class String
   def substring_count(substring)
+    starting_idx = 0
+    indices = []
+    while starting_idx < self.length
+      if self[starting_idx...(starting_idx + substring.length)] == substring
+        indices << starting_idx
+      end
+      debugger
+      starting_idx += 1
+    end
+    [indices.count, indices]
   end
+
+  def substrings
+    subs = []
+    start = 0
+    while start < self.length
+      stop = start
+        while stop < self.length
+          subs << self[start..stop]
+          stop += 1
+        end
+      start += 1
+    end
+    subs
+  end
+
 end
