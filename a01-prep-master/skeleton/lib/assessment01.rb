@@ -36,6 +36,11 @@ class String
 
 end
 
+
+def dups
+end
+
+
 class Array
   def merge_sort(&prc)
 
@@ -43,6 +48,6 @@ class Array
 
   private
   def self.merge(left, right, &prc)
-  
+
   end
 end
