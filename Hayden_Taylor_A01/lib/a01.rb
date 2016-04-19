@@ -14,7 +14,7 @@ class Array
     until sorted
       sorted = true
       i = 0
-      while i < self.length - 2
+      while i < self.length - 1 #changed 2 to 1
         if prc.call(self[i], self[i+1]) > 0
           self[i], self[i+1] = self[i+1], self[i]
           sorted = false
@@ -45,7 +45,10 @@ class Array
       # debugger
       second = first + 1
       while second < self.length
-        pairs << [first, second] if first + second == target
+        pairs << [first, second] if self[first] + self[second] == target
+        #simple mistake. I had:
+        #pairs << [first, second] if first + second == target
+        #should have named them like first_idx. assumed it was the element itself, not the idx.
         second += 1
       end
       first += 1
@@ -70,8 +73,30 @@ class Array
   # (Flattens the first level of nexted arrays but no deeper)
   # [["a"], "b", ["c", "d", ["e"]]].my_flatten(1) = ["a", "b", "c", "d", ["e"]]
 
-  def my_flatten(level = nil)
-
+  def my_flatten(level = nil, call_number = 1)
+    # debugger
+    p "level: #{level}  call_number: #{call_number}"
+    return self if self.class != Array || level == 0
+    flattened_array = []
+    self.each do |x|
+      if x.is_a?(Array)
+        p "82 array check"
+        if level.nil? || call_number <= level
+          p "self: #{self} 84 > recursive with level: #{level}; call_number: #{call_number}"
+          flattened_array += x.my_flatten(level, call_number + 1)
+        else
+          flattened_array << x
+          p " 88 adding array: level achieved."
+          p "self: #{self} level: #{level}; call_number: #{call_number}"
+          p x
+          p flattened_array
+        end
+      else
+        p " 91 x is NOT array"
+        flattened_array << x
+      end
+    end
+    flattened_array
   end
 end
 
@@ -84,6 +109,9 @@ class String
   # "cats are cool".shuffled_sentence_detector("cool cats are") => true
 
   def shuffled_sentence_detector(other)
+    original_words = self.split(" ")
+    other_words = other.split(" ")
+    original_words.sort == other_words.sort
   end
 end
 
@@ -101,13 +129,14 @@ def sum_n_primes(n)
   primes = []
   i = 2
   until primes.length == n
-    # debugger
-    sum += i if prime?(i)
-    primes << i
+    #
+    if prime?(i)
+      sum += i
+      primes << i #corrected primes counting. was adding i each time before
+    end
     i += 1
   end
   sum
-
 end
 
 class Array
@@ -126,30 +155,24 @@ end
 
 class Array
 
-    def bs(&prc)
-      self.each do |el|
-        prc.call(el)
-      end
-    end
-
     def my_inject(accumulator = nil, &prc)
-    skip_one = false
-    if accumulator.nil?
-      skip_one = true
-      accumulator = self[0]
-    end
-
-    self.each do |el|
-      # debugger
-      if skip_one == true
-        skip_one = false
-        next
+      skip_one = false
+      if accumulator.nil?
+        skip_one = true
+        accumulator = self[0]
       end
-      accumulator += prc.call(accumulator, el)
 
-    end
+      self.each do |el|
+        # debugger
+        if skip_one == true
+          skip_one = false
+          next
+        end
+        accumulator = prc.call(accumulator, el)
+        # my whole error was this: += instead of = above. assumptions, habits.
+      end
 
     accumulator
-
   end
+
 end
