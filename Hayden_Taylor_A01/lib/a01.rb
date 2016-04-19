@@ -74,25 +74,15 @@ class Array
   # [["a"], "b", ["c", "d", ["e"]]].my_flatten(1) = ["a", "b", "c", "d", ["e"]]
 
   def my_flatten(level = nil, call_number = 1)
-    # debugger
-    p "level: #{level}  call_number: #{call_number}"
-    return self if self.class != Array || level == 0
     flattened_array = []
     self.each do |x|
       if x.is_a?(Array)
-        p "82 array check"
         if level.nil? || call_number <= level
-          p "self: #{self} 84 > recursive with level: #{level}; call_number: #{call_number}"
           flattened_array += x.my_flatten(level, call_number + 1)
         else
           flattened_array << x
-          p " 88 adding array: level achieved."
-          p "self: #{self} level: #{level}; call_number: #{call_number}"
-          p x
-          p flattened_array
         end
       else
-        p " 91 x is NOT array"
         flattened_array << x
       end
     end
